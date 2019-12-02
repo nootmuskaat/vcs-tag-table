@@ -1,0 +1,81 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'tagtable/style.css' %}">
+
+<div id="app">
+  <input v-model.trim.lazy:value="filter.issue_id"
+         placeholder="ID search"
+         class="searchBar"
+         @change="updateFilters"></input>
+  <table id="tag-table" class="display dataTable" style="width: 100%">
+      <thead>
+          <tr>
+              <th></th>
+              <th class="noselect" @click="sortField('branch')">Branch</th>
+              <th class="noselect" @click="sortField('name')">Tag name</th>
+              <th class="noselect">Author</th>
+              <th class="noselect" @click="sortField('dependency1_version')">Dependency 1 version</th>
+              <th class="noselect" @click="sortField('dependency2_version')">Dependency 2 version</th>
+              <th class="noselect" @click="sortField('dependency3_version')">Dependency 3 version</th>
+              <th class="noselect" @click="sortField('release_time')">Release date</th>
+              <th>Release note</th>
+          </tr>
+          <tr>
+            <th><button @click="toggleAll">+</button></th>
+            <th><input v-model.trim.lazy:value="filter.branch"
+                       @change="updateFilters"></input></th>
+            <th><input v-model.trim.lazy:value="filter.name"
+                       @change="updateFilters"></input></th>
+            <th><input v-model.trim.lazy:value="filter.author"
+                       @change="updateFilters"></input></th>
+            <th><input v-model.trim.lazy:value="filter.dependency1_version"
+                       @change="updateFilters"></input></th>
+            <th><input v-model.trim.lazy:value="filter.dependency2_version"
+                       @change="updateFilters"></input></th>
+            <th><input v-model.trim.lazy:value="filter.dependency3_version"
+                       @change="updateFilters"></input></th>
+            <th><input v-model.trim.lazy:value="filter.release_time"
+                       @change="updateFilters"></input></th>
+            <th></th>
+          </tr>
+      </thead>
+      <tbody>
+        <template v-for="tag_data in info.data.results" >
+          <tag-detail  :tag="tag_data"
+                       :key="tag_data.name"
+                       @toggle-commits="toggleCommits"></tag-detail>
+          <tag-commits v-show="expanded.indexOf(tag_data.commits[0].git_hash) != -1"
+                       :commits="tag_data.commits"
+                       :key="tag_data.commits[0].git_hash"></tag-commits>
+        </template>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="8">
+            <button @click="firstPage">&lt;&lt;</button>
+            <button @click="previousPage">&lt;</button>
+            page <input v-model.number="pagination.number"
+                        @change="refresh"
+                        style="width: 60px"></input> of [[ this.total_pages ]]
+            <button @click="nextPage">&gt;</button>
+            <button @click="lastPage">&gt;&gt;</button>
+          </th>
+        </tr>
+        <tr>
+          <th colspan="8">
+            <label>Results per page:</label>
+            <select v-model.number="pagination.size" @change="resetPageSize">
+              <option>10</option>
+              <option>25</option>
+              <option>50</option>
+            </select>
+          </th>
+        </tr>
+      </tfoot>
+  </table>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="{% static 'tagtable/js/tagvue.js' %}"></script>

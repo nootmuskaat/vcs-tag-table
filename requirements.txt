@@ -1,0 +1,5 @@
+django>=2.0
+psycopg2>=2.5.4
+gunicorn
+djangorestframework
+django-filter
